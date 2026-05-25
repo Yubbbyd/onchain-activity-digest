@@ -1,0 +1,205 @@
+# Onchain Activity Digest
+
+A Pharos Agent Center skill that summarizes the last 7 days of onchain activity for any wallet address — tokens sent/received, contracts interacted with, gas spent — returned as a clean, AI-narrable report.
+
+---
+
+## What This Skill Does
+
+Given a wallet address, this skill:
+
+- Fetches all transactions and ERC20 token transfers from the last 7 days on the Pharos network
+- Categorizes activity into: tokens sent, tokens received, native transfers, and contract interactions
+- Calculates total gas spent in native token and USD
+- Flags notable events (large transfers, first-time contract interactions, contract deployments)
+- Returns either a short plain-English narrative (summary mode) or a full structured JSON report (detailed mode)
+
+This enables any AI agent to answer: *"What has this wallet been doing this week?"*
+
+---
+
+## Supported Frameworks
+
+- Codex
+- Claude Code
+- OpenClaw
+- Any framework compatible with the Pharos Skill Engine
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/YOUR_GITHUB/onchain-activity-digest
+cd onchain-activity-digest
+npm install
+```
+
+---
+
+## Configuration
+
+Edit `src/utils/config.js` and set:
+
+```js
+export const PHAROS_RPC_URL = "https://your-pharos-rpc-endpoint";
+export const PHAROS_EXPLORER_API = "https://your-pharos-explorer-api";
+```
+
+Replace placeholders with your actual Pharos RPC and explorer API URLs.
+
+---
+
+## Usage
+
+### As a Skill (via Agent Center)
+
+The skill accepts the following inputs:
+
+| Parameter | Type   | Required | Default    | Description                          |
+|-----------|--------|----------|------------|--------------------------------------|
+| wallet    | string | Yes      | —          | The wallet address to analyze        |
+| days      | number | No       | 7          | Number of days to look back          |
+| format    | string | No       | "summary"  | "summary" or "detailed"              |
+
+**Natural language triggers (examples):**
+- *"Give me a weekly digest for wallet 0xABC...123"*
+- *"What has 0xABC...123 been doing onchain this week?"*
+- *"Summarize the last 7 days of activity for this wallet: 0xABC...123"*
+
+---
+
+### CLI Test Mode
+
+To test the skill directly from the terminal:
+
+```bash
+node src/index.js
+```
+
+This runs a sample digest against a hardcoded test wallet and logs the result.
+
+---
+
+### Programmatic Usage
+
+```js
+import { generateDigest } from "./src/digest.js";
+
+// Summary mode
+const summary = await generateDigest("0xABC...123", 7, "summary");
+console.log(summary.narrative);
+
+// Detailed mode
+const report = await generateDigest("0xABC...123", 7, "detailed");
+console.log(report);
+```
+
+---
+
+## Example Output
+
+### Summary Mode
+
+```
+Wallet 0xABC...123 had 24 transactions in the last 7 days.
+They sent 450 USDC across 3 transfers and received 0.8 ETH from 2 addresses.
+They interacted with 5 unique contracts, mostly DeFi-related.
+Total gas spent: 0.004 ETH (~$1.20).
+Notable: First-time interaction with 0xDEF...456 on May 23.
+```
+
+### Detailed Mode
+
+```json
+{
+  "wallet": "0xABC...123",
+  "period": { "start": "2026-05-18", "end": "2026-05-25" },
+  "total_transactions": 24,
+  "tokens_received": [
+    { "token": "ETH", "amount": 0.8, "from": "0x111...aaa", "txCount": 2 }
+  ],
+  "tokens_sent": [
+    { "token": "USDC", "amount": 450, "to": "0x222...bbb", "txCount": 3 }
+  ],
+  "contracts_interacted": [
+    { "address": "0xDEF...456", "label": "Unknown Contract", "callCount": 4, "firstTime": true }
+  ],
+  "gas_spent": { "native": 0.004, "symbol": "PTT", "usdEstimate": 1.20 },
+  "highlights": [
+    "First interaction with 0xDEF...456 on 2026-05-23",
+    "Largest single transfer: 300 USDC on 2026-05-21"
+  ],
+  "narrative": "Wallet 0xABC...123 had 24 transactions in the last 7 days..."
+}
+```
+
+---
+
+## Project Structure
+
+```
+onchain-activity-digest/
+├── README.md
+├── skill.json
+├── src/
+│   ├── index.js
+│   ├── digest.js
+│   ├── fetcher/
+│   │   ├── transactions.js
+│   │   └── tokenTransfers.js
+│   ├── parser/
+│   │   ├── categorize.js
+│   │   ├── gasCalculator.js
+│   │   └── highlight.js
+│   ├── formatter/
+│   │   ├── summary.js
+│   │   └── detailed.js
+│   └── utils/
+│       ├── timeFilter.js
+│       ├── addressLabel.js
+│       └── config.js
+├── examples/
+│   ├── sample-output-summary.json
+│   └── sample-output-detailed.json
+└── tests/
+    ├── digest.test.js
+    └── parser.test.js
+```
+
+---
+
+## Dependencies
+
+```json
+{
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.0.0"
+  }
+}
+```
+
+Node.js v18+ recommended (native fetch available).
+
+---
+
+## Notes
+
+- Gas USD conversion uses a static rate in `config.js`. Replace with a live price feed (e.g. CoinGecko API) for production use.
+- Known contract labels in `addressLabel.js` are placeholders — extend with verified Pharos ecosystem addresses.
+- The skill is read-only and does not sign or send any transactions.
+- No private keys or sensitive data are required.
+
+---
+
+## Author
+
+GitHub: [YOUR_GITHUB_HANDLE]  
+Email: [YOUR_EMAIL]
+
+---
+
+## License
+
+MIT

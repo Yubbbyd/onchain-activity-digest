@@ -1,0 +1,8 @@
+{
+  "name": "onchain-activity-digest",
+  "version": "1.0.0",
+  "description": "Generates a digest of onchain activity for a wallet address on the Pharos blockchain, including transaction categorization, gas cost analysis, and activity highlights.",
+  "author": "Pharos Skill Developer",
+  "keywords": ["pharos", "blockchain", "digest", "activity", "transactions", "tokens", "gas"],
+  "main": "src/index.js"
+}
