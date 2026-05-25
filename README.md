@@ -195,8 +195,8 @@ Node.js v18+ recommended (native fetch available).
 
 ## Author
 
-GitHub: [YOUR_GITHUB_HANDLE]  
-Email: [YOUR_EMAIL]
+GitHub: [Yubbbyd]  
+Email: [kolawalle1988@gmail.com]
 
 ---
 
